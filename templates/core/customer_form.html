@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | CRM System{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">{{ title }}</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-6">
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- First Name -->
+            <div class="space-y-2">
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
+                {{ form.first_name.errors }}
+                <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
+                       value="{{ form.first_name.value|default:'' }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            
+            <!-- Last Name -->
+            <div class="space-y-2">
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
+                {{ form.last_name.errors }}
+                <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
+                       value="{{ form.last_name.value|default:'' }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            
+            <!-- Email -->
+            <div class="space-y-2">
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
+                {{ form.email.errors }}
+                <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" 
+                       value="{{ form.email.value|default:'' }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            
+            <!-- Phone -->
+            <div class="space-y-2">
+                <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone</label>
+                {{ form.phone.errors }}
+                <input type="text" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}" 
+                       value="{{ form.phone.value|default:'' }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <!-- Company -->
+            <div class="space-y-2">
+                <label for="{{ form.company.id_for_label }}" class="block text-sm font-medium text-gray-700">Company</label>
+                {{ form.company.errors }}
+                <input type="text" name="{{ form.company.name }}" id="{{ form.company.id_for_label }}" 
+                       value="{{ form.company.value|default:'' }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <!-- Status -->
+            <div class="space-y-2">
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700">Status</label>
+                {{ form.status.errors }}
+                <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" 
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                               focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    {% for value, text in form.fields.status.choices %}
+                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ text }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Assigned To -->
+            <div class="space-y-2">
+                <label for="{{ form.assigned_to.id_for_label }}" class="block text-sm font-medium text-gray-700">Assigned To</label>
+                {{ form.assigned_to.errors }}
+                <select name="{{ form.assigned_to.name }}" id="{{ form.assigned_to.id_for_label }}" 
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                               focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- Not Assigned --</option>
+                    {% for value, text in form.fields.assigned_to.choices %}
+                    {% if value %}
+                    <option value="{{ value }}" {% if form.assigned_to.value|stringformat:"i" == value|stringformat:"i" %}selected{% endif %}>{{ text }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <!-- Notes -->
+        <div class="space-y-2">
+            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700">Notes</label>
+            {{ form.notes.errors }}
+            <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="4"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                             focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="flex justify-end pt-4">
+            <a href="{% url 'customer_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md mr-2">
+                Cancel
+            </a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+                Save Customer
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

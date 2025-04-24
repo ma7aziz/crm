@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | CRM System{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">{{ title }}</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-6">
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Customer -->
+            <div class="space-y-2">
+                <label for="{{ form.customer.id_for_label }}" class="block text-sm font-medium text-gray-700">Customer</label>
+                {{ form.customer.errors }}
+                <select name="{{ form.customer.name }}" id="{{ form.customer.id_for_label }}" 
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                               focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        {% if customer %}disabled{% endif %} required>
+                    {% if not customer %}
+                        <option value="">-- Select Customer --</option>
+                        {% for value, text in form.fields.customer.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.customer.value|stringformat:"i" == value|stringformat:"i" %}selected{% endif %}>{{ text }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <option value="{{ customer.id }}" selected>{{ customer.first_name }} {{ customer.last_name }}</option>
+                    {% endif %}
+                </select>
+                {% if customer %}
+                    <input type="hidden" name="{{ form.customer.name }}" value="{{ customer.id }}">
+                {% endif %}
+            </div>
+            
+            <!-- Interaction Type -->
+            <div class="space-y-2">
+                <label for="{{ form.interaction_type.id_for_label }}" class="block text-sm font-medium text-gray-700">Interaction Type</label>
+                {{ form.interaction_type.errors }}
+                <select name="{{ form.interaction_type.name }}" id="{{ form.interaction_type.id_for_label }}" 
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                               focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    <option value="">-- Select Type --</option>
+                    {% for value, text in form.fields.interaction_type.choices %}
+                        <option value="{{ value }}" {% if form.interaction_type.value == value %}selected{% endif %}>{{ text }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Date -->
+            <div class="space-y-2">
+                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700">Date & Time</label>
+                {{ form.date.errors }}
+                <input type="datetime-local" name="{{ form.date.name }}" id="{{ form.date.id_for_label }}" 
+                       value="{% if form.date.value %}{{ form.date.value|date:'Y-m-d' }}T{{ form.date.value|time:'H:i' }}{% endif %}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+        </div>
+        
+        <!-- Notes -->
+        <div class="space-y-2">
+            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700">Notes</label>
+            {{ form.notes.errors }}
+            <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="6"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                             focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>{{ form.notes.value|default:'' }}</textarea>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="flex justify-end pt-4">
+            {% if customer %}
+                <a href="{% url 'customer_detail' customer.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md mr-2">
+                    Cancel
+                </a>
+            {% else %}
+                <a href="{% url 'interaction_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md mr-2">
+                    Cancel
+                </a>
+            {% endif %}
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+                {% if interaction %}Update{% else %}Save{% endif %} Interaction
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

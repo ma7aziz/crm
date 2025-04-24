@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | CRM System{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+<!-- Status Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-secondary-500">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Leads</h3>
+        <p class="text-3xl font-bold text-secondary-600">{{ lead_count }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-primary-500">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Opportunities</h3>
+        <p class="text-3xl font-bold text-primary-600">{{ opportunity_count }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-primary-600">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Customers</h3>
+        <p class="text-3xl font-bold text-primary-600">{{ customer_count }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-gray-500">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Archived</h3>
+        <p class="text-3xl font-bold text-gray-600">{{ archived_count }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Interactions -->
+    <div>
+        <h2 class="text-2xl font-semibold mb-4 text-primary-700">Recent Interactions</h2>
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-4 border-b">
+                <h3 class="font-medium text-gray-700">Latest Activity</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for interaction in recent_interactions %}
+                <div class="p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="px-2 py-1 text-xs leading-5 font-semibold rounded-full 
+                                {% if interaction.interaction_type == 'call' %}bg-secondary-100 text-secondary-800
+                                {% elif interaction.interaction_type == 'meeting' %}bg-primary-100 text-primary-800
+                                {% elif interaction.interaction_type == 'email' %}bg-secondary-100 text-secondary-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ interaction.get_interaction_type_display }}
+                            </span>
+                            <p class="mt-1">
+                                <a href="{% url 'customer_detail' interaction.customer.id %}" class="font-medium text-secondary-600 hover:text-secondary-800">
+                                    {{ interaction.customer.first_name }} {{ interaction.customer.last_name }}
+                                </a>
+                            </p>
+                            <p class="text-sm text-gray-600 mt-1">{{ interaction.notes|truncatechars:100 }}</p>
+                        </div>
+                        <div class="text-xs text-right text-gray-500">
+                            {{ interaction.date|date:"M d, Y" }}<br>
+                            {{ interaction.date|time:"h:i A" }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">No recent interactions</div>
+                {% endfor %}
+            </div>
+            <div class="p-4 bg-gray-50 rounded-b-lg">
+                <a href="{% url 'interaction_list' %}" class="text-secondary-600 hover:text-secondary-800 text-sm font-medium">View all interactions →</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer List Summary -->
+    <div>
+        <h2 class="text-2xl font-semibold mb-4 text-primary-700">Customer Summary</h2>
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-4 border-b">
+                <h3 class="font-medium text-gray-700">Latest Customers</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for customer in customers|slice:":5" %}
+                <div class="p-4">
+                    <div class="flex justify-between">
+                        <div>
+                            <a href="{% url 'customer_detail' customer.id %}" class="font-medium text-primary-600 hover:text-primary-800">
+                                {{ customer.first_name }} {{ customer.last_name }}
+                            </a>
+                            <p class="text-sm text-gray-600">{{ customer.company|default:"" }}</p>
+                        </div>
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if customer.status == 'lead' %}bg-secondary-100 text-secondary-800
+                            {% elif customer.status == 'opportunity' %}bg-primary-100 text-primary-800
+                            {% elif customer.status == 'customer' %}bg-primary-100 text-primary-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ customer.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">No customers yet</div>
+                {% endfor %}
+            </div>
+            <div class="p-4 bg-gray-50 rounded-b-lg">
+                <a href="{% url 'customer_list' %}" class="text-primary-600 hover:text-primary-800 text-sm font-medium">View all customers →</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{
+  "name": "theme",
+  "version": "1.0.0",
+  "description": "Tailwind CSS theme for CRM",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tailwindcss -i src/styles/tailwind.css -o ../static/css/style.css --minify",
+    "dev": "npx tailwindcss -i src/styles/tailwind.css -o ../static/css/style.css --watch"
+  },
+  "keywords": [
+    "tailwind",
+    "django"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.4",
+    "tailwindcss": "^3.0.0"
+  }
+}
