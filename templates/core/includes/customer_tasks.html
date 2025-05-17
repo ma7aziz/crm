@@ -1,0 +1,49 @@
+<div class="bg-white rounded-lg shadow-md p-6 mt-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-primary-700">Tasks</h2>
+        {% if content_type_id and customer.id %}
+        <a href="{% url 'tasks:task_create_related' content_type_id=content_type_id object_id=customer.id %}" 
+           class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+            Add Task
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {% for task in related_tasks %}
+        <div class="border-l-4 
+            {% if task.priority == 'high' %}border-red-500
+            {% elif task.priority == 'medium' %}border-yellow-500
+            {% else %}border-green-500{% endif %} 
+            pl-4 py-2 bg-gray-50 rounded-r">
+            <div class="flex justify-between">
+                <a href="{% url 'tasks:task_detail' task.id %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    {{ task.title }}
+                </a>
+                <div>
+                    {% if task.status == 'pending' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Pending
+                    </span>
+                    {% elif task.status == 'in_progress' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        In Progress
+                    </span>
+                    {% elif task.status == 'completed' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Completed
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="text-sm text-gray-600">Due: {{ task.due_date|date:"F d, Y H:i" }}</p>
+            <p class="text-sm text-gray-600">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</p>
+            {% if task.description %}
+            <p class="text-sm text-gray-700 mt-2 line-clamp-2">{{ task.description }}</p>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p class="text-center text-sm text-gray-500 py-4">No tasks assigned to this customer</p>
+        {% endfor %}
+    </div>
+</div>

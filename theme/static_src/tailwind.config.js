@@ -8,44 +8,57 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // New primary teal color (#1d9d86) and its shades
+        // Modern primary indigo color (#4f46e5) and its shades
         'primary': {
-          50: '#e6f5f2',
-          100: '#cceae6',
-          200: '#99d5cc',
-          300: '#66c1b3',
-          400: '#33ac99',
-          500: '#1d9d86', // Base color
-          600: '#177d6b',
-          700: '#115e50',
-          800: '#0c3e36',
-          900: '#061f1b',
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1', // Base color
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
         },
-        // New secondary blue color (#0088cc) and its shades
+        // Neutral secondary color
         'secondary': {
-          50: '#e6f5fc',
-          100: '#ccebf9',
-          200: '#99d7f2',
-          300: '#66c3ec',
-          400: '#33afe5',
-          500: '#0088cc', // Base color
-          600: '#006da3',
-          700: '#00527a',
-          800: '#003652',
-          900: '#001b29',
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280', // Base color
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
-        // New danger red color (#d20120) and its shades
+        // Accent color for actions
+        'accent': {
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6', // Base color
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+        },
+        // Danger red color
         'danger': {
-          50: '#fce6e9',
-          100: '#f9ccd3',
-          200: '#f299a7',
-          300: '#ec667a',
-          400: '#e5334e',
-          500: '#d20120', // Base color
-          600: '#a8011a',
-          700: '#7e0114',
-          800: '#54000d',
-          900: '#2a0007',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444', // Base color
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
         },
       },
     },

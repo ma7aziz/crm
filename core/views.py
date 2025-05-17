@@ -4,10 +4,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from .forms import SignUpForm, CustomerForm, InteractionForm, LoginForm, AdminUserCreationForm
 from .models import Customer, Interaction
 from django.http import HttpResponseRedirect
-
+from tasks.models import Task
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
@@ -49,6 +50,12 @@ def dashboard_view(request):
     customer_count = Customer.objects.filter(status=Customer.CUSTOMER).count()
     archived_count = Customer.objects.filter(status=Customer.ARCHIVED).count()
 
+    # Get tasks based on user role
+    if request.user.is_staff or request.user.is_superuser:
+        tasks = Task.objects.all().order_by('-due_date')[:10]  # Show all tasks for admin users
+    else:
+        tasks = Task.objects.filter(assigned_to=request.user).order_by('-due_date')[:10]  # Only assigned tasks for regular users
+
     # Get customers assigned to current user
     if not request.user.is_staff and not request.user.is_superuser:
         customers = customers.filter(assigned_to=request.user)
@@ -60,6 +67,7 @@ def dashboard_view(request):
         'opportunity_count': opportunity_count,
         'customer_count': customer_count,
         'archived_count': archived_count,
+        'tasks': tasks,  # Add tasks to context
     }
     return render(request, 'core/dashboard.html', context)
 
@@ -74,6 +82,13 @@ def customer_list_view(request):
 def customer_detail_view(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     interactions = customer.interactions.order_by('-date')
+    
+    # Get customer content type for related tasks
+    content_type = ContentType.objects.get_for_model(Customer)
+    related_tasks = Task.objects.filter(
+        content_type=content_type,
+        object_id=customer.id
+    ).order_by('-due_date')
     
     if request.method == 'POST':
         interaction_form = InteractionForm(request.POST)
@@ -91,6 +106,8 @@ def customer_detail_view(request, pk):
         'customer': customer,
         'interactions': interactions,
         'interaction_form': interaction_form,
+        'related_tasks': related_tasks,
+        'content_type_id': content_type.id,
     }
     return render(request, 'core/customer_detail.html', context)
 
