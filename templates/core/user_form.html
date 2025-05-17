@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %}Create New User | CRM System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Create New User</h2>
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-50 bg-red-600 text-white px-6 py-3 rounded shadow-lg"></div>
+    {% if form.non_field_errors %}
+        <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+            <ul class="list-disc pl-5">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <form method="post" class="space-y-4" id="user-create-form" novalidate>
+        {% csrf_token %}
+        <div class="space-y-2">
+            <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}"
+                   class="mt-1 block w-full px-3 py-2 border {% if form.username.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+            {% for error in form.username.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="space-y-2">
+            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+                   class="mt-1 block w-full px-3 py-2 border {% if form.first_name.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+            {% for error in form.first_name.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="space-y-2">
+            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+                   class="mt-1 block w-full px-3 py-2 border {% if form.last_name.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+            {% for error in form.last_name.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="space-y-2">
+            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
+                   class="mt-1 block w-full px-3 py-2 border {% if form.email.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+            {% for error in form.email.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="space-y-2">
+            <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+            <div class="relative">
+                <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}"
+                    class="mt-1 block w-full px-3 py-2 border {% if form.password1.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+                <button type="button" id="toggle-pw1" tabindex="-1"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none">
+                    <svg id="pw1-eye" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                </button>
+            </div>
+            {% for error in form.password1.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+            <div class="w-full h-2 bg-gray-200 rounded mt-2">
+                <div id="pw-strength-bar" class="h-2 rounded transition-all duration-300" style="width:0%"></div>
+            </div>
+            <ul class="text-xs mt-2 space-y-1" id="pw-requirements">
+                <li id="pw-length" class="text-gray-500">At least 8 characters</li>
+                <li id="pw-uppercase" class="text-gray-500">Contains uppercase letter</li>
+                <li id="pw-lowercase" class="text-gray-500">Contains lowercase letter</li>
+                <li id="pw-number" class="text-gray-500">Contains a number</li>
+                <li id="pw-special" class="text-gray-500">Contains a special character</li>
+            </ul>
+        </div>
+        <div class="space-y-2">
+            <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <div class="relative">
+                <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}"
+                    class="mt-1 block w-full px-3 py-2 border {% if form.password2.errors %}border-red-500 bg-red-50 invalid{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+                <button type="button" id="toggle-pw2" tabindex="-1"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none">
+                    <svg id="pw2-eye" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                </button>
+            </div>
+            {% for error in form.password2.errors %}
+                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+            <p id="pw-match-msg" class="text-xs mt-1 text-gray-500"></p>
+        </div>
+        <div class="flex justify-between pt-4">
+            <a href="{% url 'user_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">
+                Cancel
+            </a>
+            <button type="submit" class="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded">
+                Create User
+            </button>
+        </div>
+    </form>
+</div>
+<style>
+/* Add a style for the invalid class */
+.invalid {
+    border-color: #dc2626 !important; /* Tailwind red-600 */
+    background-color: #fef2f2 !important; /* Tailwind red-50 */
+}
+#pw-strength-bar.bg-red-500 { background-color: #ef4444; }
+#pw-strength-bar.bg-yellow-400 { background-color: #facc15; }
+#pw-strength-bar.bg-green-500 { background-color: #22c55e; }
+#pw-requirements .valid { color: #22c55e; } /* green-500 */
+#pw-requirements .invalid { color: #ef4444; } /* red-500 */
+.relative input[type="password"], .relative input[type="text"] {
+    padding-right: 2.5rem !important;
+}
+.relative button[id^="toggle-pw"] {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280; /* gray-500 */
+    z-index: 10;
+}
+.relative button[id^="toggle-pw"]:hover {
+    color: #4b5563; /* gray-600 */
+}
+.relative button[id^="toggle-pw"]:focus {
+    outline: none;
+}
+.relative svg {
+    pointer-events: none;
+    height: 1.25rem;
+    width: 1.25rem;
+}
+/* Add styles for password match indication */
+.text-green-500 {
+    color: #22c55e !important; /* Tailwind green-500 */
+    font-weight: 500;
+}
+.border-green-500 {
+    border-color: #22c55e !important; /* Tailwind green-500 */
+}
+input.password-match {
+    border-color: #22c55e !important; /* Tailwind green-500 */
+    background-color: #f0fdf4 !important; /* Tailwind green-50 */
+}
+</style>
+<script>
+// Client-side validation for email and password match
+const form = document.getElementById('user-create-form');
+const toast = document.getElementById('toast');
+function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    toast.classList.add('flex');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+    }, 3000);
+}
+const pw1 = form.querySelector('input[name="password1"]');
+const pw2 = form.querySelector('input[name="password2"]');
+const pwStrengthBar = document.getElementById('pw-strength-bar');
+const pwRequirements = {
+    length: document.getElementById('pw-length'),
+    uppercase: document.getElementById('pw-uppercase'),
+    lowercase: document.getElementById('pw-lowercase'),
+    number: document.getElementById('pw-number'),
+    special: document.getElementById('pw-special')
+};
+const pwMatchMsg = document.getElementById('pw-match-msg');
+
+function checkPasswordStrength(pw) {
+    let score = 0;
+    // Check requirements
+    const checks = {
+        length: pw.length >= 8,
+        uppercase: /[A-Z]/.test(pw),
+        lowercase: /[a-z]/.test(pw),
+        number: /\d/.test(pw),
+        special: /[^A-Za-z0-9]/.test(pw)
+    };
+    // Update UI for requirements
+    for (const key in pwRequirements) {
+        if (checks[key]) {
+            pwRequirements[key].classList.add('valid');
+            pwRequirements[key].classList.remove('invalid', 'text-gray-500');
+        } else {
+            pwRequirements[key].classList.add('invalid');
+            pwRequirements[key].classList.remove('valid', 'text-gray-500');
+        }
+        if (checks[key]) score++;
+    }
+    // Strength bar
+    let percent = (score / 5) * 100;
+    pwStrengthBar.style.width = percent + '%';
+    pwStrengthBar.className = 'h-2 rounded transition-all duration-300';
+    if (score <= 2) {
+        pwStrengthBar.classList.add('bg-red-500');
+    } else if (score === 3 || score === 4) {
+        pwStrengthBar.classList.add('bg-yellow-400');
+    } else if (score === 5) {
+        pwStrengthBar.classList.add('bg-green-500');
+    }
+    return score === 5;
+}
+
+function checkPasswordMatch() {
+    if (!pw1.value && !pw2.value) {
+        pwMatchMsg.textContent = '';
+        pw2.classList.remove('password-match', 'border-green-500');
+        return true;
+    }
+    if (pw1.value === pw2.value && pw1.value.length >= 8) {
+        pwMatchMsg.textContent = 'Passwords match';
+        pwMatchMsg.className = 'text-xs mt-1 text-green-500';
+        pw2.classList.add('password-match', 'border-green-500');
+        return true;
+    } else {
+        pwMatchMsg.textContent = 'Passwords do not match';
+        pwMatchMsg.className = 'text-xs mt-1 text-red-500';
+        pw2.classList.remove('password-match', 'border-green-500');
+        return false;
+    }
+}
+
+pw1.addEventListener('input', function() {
+    checkPasswordStrength(pw1.value);
+    checkPasswordMatch();
+});
+pw2.addEventListener('input', function() {
+    checkPasswordMatch();
+});
+
+form.addEventListener('submit', function(e) {
+    // Remove previous error highlights and invalid class
+    form.querySelectorAll('.border-red-500, .invalid').forEach(el => {
+        el.classList.remove('border-red-500', 'bg-red-50', 'invalid');
+    });
+    let valid = true;
+    // Email validation
+    const email = form.querySelector('input[type="email"]');
+    const emailVal = email.value.trim();
+    const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailPattern.test(emailVal)) {
+        email.classList.add('border-red-500', 'bg-red-50', 'invalid');
+        showToast('Please enter a valid email address.');
+        valid = false;
+    }
+    // Password requirements validation
+    const pwStrong = checkPasswordStrength(pw1.value);
+    if (!pwStrong) {
+        pw1.classList.add('border-red-500', 'bg-red-50', 'invalid');
+        showToast('Password does not meet all requirements.');
+        valid = false;
+    }
+    // Password match validation
+    if (pw1.value !== pw2.value || pw1.value.length < 8) {
+        pw1.classList.add('border-red-500', 'bg-red-50', 'invalid');
+        pw2.classList.add('border-red-500', 'bg-red-50', 'invalid');
+        showToast('Passwords must match and be at least 8 characters.');
+        valid = false;
+    }
+    if (!valid) {
+        e.preventDefault();
+    }
+});
+
+// Show/hide password logic
+function setupTogglePassword(inputId, btnId, eyeId) {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    const eye = document.getElementById(eyeId);
+    let shown = false;
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        shown = !shown;
+        input.type = shown ? 'text' : 'password';
+        // Optionally, you can swap the eye icon here for open/closed
+        if (shown) {
+            eye.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m1.414-1.414A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.293 5.95M15 12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18" />`;
+        } else {
+            eye.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+        }
+    });
+}
+setupTogglePassword('{{ form.password1.id_for_label }}', 'toggle-pw1', 'pw1-eye');
+setupTogglePassword('{{ form.password2.id_for_label }}', 'toggle-pw2', 'pw2-eye');
+</script>
+{% endblock %}

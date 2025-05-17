@@ -1,0 +1,4 @@
+Django==5.2
+django-tailwind==3.9.0
+pillow==10.1.0  # For handling images in media files
+django-crispy-forms==2.1  # Recommended for form styling

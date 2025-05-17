@@ -14,6 +14,18 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
 
+class AdminUserCreationForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    is_staff = forms.BooleanField(required=False, help_text="Designates whether the user can log into this admin site.")
+    is_superuser = forms.BooleanField(required=False, help_text="Designates that this user has all permissions without explicitly assigning them.")
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_superuser', 'password1', 'password2')
+
+
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer

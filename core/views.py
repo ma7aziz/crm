@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.utils import timezone
-from .forms import SignUpForm, CustomerForm, InteractionForm, LoginForm
+from django.contrib.auth.models import User
+from .forms import SignUpForm, CustomerForm, InteractionForm, LoginForm, AdminUserCreationForm
 from .models import Customer, Interaction
 from django.http import HttpResponseRedirect
+
+def is_admin(user):
+    return user.is_staff or user.is_superuser
 
 def signup_view(request):
     if request.method == 'POST':
@@ -44,6 +48,10 @@ def dashboard_view(request):
     opportunity_count = Customer.objects.filter(status=Customer.OPPORTUNITY).count()
     customer_count = Customer.objects.filter(status=Customer.CUSTOMER).count()
     archived_count = Customer.objects.filter(status=Customer.ARCHIVED).count()
+
+    # Get customers assigned to current user
+    if not request.user.is_staff and not request.user.is_superuser:
+        customers = customers.filter(assigned_to=request.user)
     
     context = {
         'customers': customers,
@@ -220,3 +228,66 @@ def interaction_delete_view(request, pk):
         'title': f"Delete Interaction"
     }
     return render(request, 'core/interaction_confirm_delete.html', context)
+
+# Admin-only user management views
+@login_required
+@user_passes_test(is_admin)
+def user_list_view(request):
+    """Admin view to list all users"""
+    users = User.objects.all().order_by('-date_joined')
+    return render(request, 'core/user_list.html', {'users': users})
+
+
+@login_required
+@user_passes_test(is_admin)
+def user_create_view(request):
+    """Admin view to create a new user"""
+    if request.method == 'POST':
+        form = AdminUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f"User {user.username} created successfully!")
+            return redirect('user_list')
+    else:
+        form = AdminUserCreationForm()
+    
+    return render(request, 'core/user_form.html', {'form': form, 'title': 'Create New User'})
+
+
+@login_required
+@user_passes_test(is_admin)
+def user_detail_view(request, pk):
+    """Admin view to see user details and assigned customers"""
+    user = get_object_or_404(User, pk=pk)
+    assigned_customers = Customer.objects.filter(assigned_to=user)
+    
+    context = {
+        'user_profile': user,  # Renamed to avoid template confusion with the request.user
+        'assigned_customers': assigned_customers,
+    }
+    return render(request, 'core/user_detail.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def user_update_view(request, pk):
+    """Admin view to update a user's details"""
+    user = get_object_or_404(User, pk=pk)
+    
+    if request.method == 'POST':
+        # Can't use the regular AdminUserCreationForm as it requires password
+        # We'd need a custom form for updates, but we'll update fields directly for simplicity
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.is_staff = 'is_staff' in request.POST
+        user.is_superuser = 'is_superuser' in request.POST
+        user.save()
+        
+        messages.success(request, f"User {user.username} updated successfully!")
+        return redirect('user_detail', pk=user.pk)
+    
+    context = {
+        'user_profile': user,
+    }
+    return render(request, 'core/user_update_form.html', context)

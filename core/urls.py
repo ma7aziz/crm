@@ -25,4 +25,10 @@ urlpatterns = [
     path('customers/<int:customer_id>/interactions/create/', views.interaction_create_view, name='customer_interaction_create'),
     path('interactions/<int:pk>/update/', views.interaction_update_view, name='interaction_update'),
     path('interactions/<int:pk>/delete/', views.interaction_delete_view, name='interaction_delete'),
+    
+    # User management URLs (admin only)
+    path('users/', views.user_list_view, name='user_list'),
+    path('users/create/', views.user_create_view, name='user_create'),
+    path('users/<int:pk>/', views.user_detail_view, name='user_detail'),
+    path('users/<int:pk>/update/', views.user_update_view, name='user_update'),
 ]

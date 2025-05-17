@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Update User | CRM System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Update User</h2>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" value="{{ user_profile.username }}" disabled class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" />
+        </div>
+        <div class="space-y-2">
+            <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input type="text" name="first_name" id="first_name" value="{{ user_profile.first_name }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required />
+        </div>
+        <div class="space-y-2">
+            <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input type="text" name="last_name" id="last_name" value="{{ user_profile.last_name }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required />
+        </div>
+        <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="email" id="email" value="{{ user_profile.email }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required />
+        </div>
+        <div class="space-y-2">
+            <div class="flex items-center">
+                <input type="checkbox" name="is_staff" id="is_staff" {% if user_profile.is_staff %}checked{% endif %} class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" />
+                <label for="is_staff" class="ml-2 block text-sm text-gray-700">Staff Status</label>
+            </div>
+        </div>
+        <div class="space-y-2">
+            <div class="flex items-center">
+                <input type="checkbox" name="is_superuser" id="is_superuser" {% if user_profile.is_superuser %}checked{% endif %} class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" />
+                <label for="is_superuser" class="ml-2 block text-sm text-gray-700">Superuser Status</label>
+            </div>
+        </div>
+        <div class="flex justify-between pt-4">
+            <a href="{% url 'user_detail' user_profile.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">Cancel</a>
+            <button type="submit" class="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded">Update User</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
